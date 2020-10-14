@@ -86,6 +86,7 @@ class UiMainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout.addWidget(self.resultTitleLabel)
         self.resultLabel = QtWidgets.QLabel(self.layoutWidget)
         self.resultLabel.setObjectName("resultLabel")
+        self.resultLabel.setWordWrap(True)
         self.horizontalLayout.addWidget(self.resultLabel)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.horizontalLayout_2.addLayout(self.verticalLayout)
@@ -152,7 +153,8 @@ class UiMainWindow(QtWidgets.QMainWindow):
             response = requests.request("POST", "https://node-js-face-recognition.herokuapp.com/compare", files=files,
                                         proxies=proxy_dict)
             # self.resultLabel.setText(response.text)
-            print(response.text)
+            self.resultLabel.setText(response.text)
+            # print(response.text)
             imageFileDescriptor.close()
             if os.path.exists(filePath):
                 os.remove(filePath)
