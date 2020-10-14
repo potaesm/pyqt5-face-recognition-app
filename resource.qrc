@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="src">
+    <file>Images/tae.png</file>
+    <file>Themes/eyeIcon.png</file>
+  </qresource>
+</RCC>
