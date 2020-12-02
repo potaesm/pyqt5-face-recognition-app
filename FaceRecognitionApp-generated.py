@@ -150,7 +150,7 @@ class UiMainWindow(QtWidgets.QMainWindow):
                 ("imgs", (imgName, imageFileDescriptor, 'multipart/form-data', {'Expires': '0'})),
                 ("imgs", (compareImgName, compareImageFileDescriptor, 'multipart/form-data', {'Expires': '0'}))
             ]
-            response = requests.request("POST", "https://node-js-face-recognition.herokuapp.com/compare", files=files,
+            response = requests.request("POST", "https://node-js-face-api.herokuapp.com/compare", files=files,
                                         proxies=proxy_dict)
             # self.resultLabel.setText(response.text)
             self.resultLabel.setText(response.text)
