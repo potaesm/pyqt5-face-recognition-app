@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QFileDialog, QSystemTrayIcon, QStyle, QAction, qApp, QMenu
 import resource
 import cv2
 import tempfile
@@ -17,10 +17,27 @@ class UiMainWindow(QtWidgets.QMainWindow):
         self.__onCaptureClicked = False
         self.__onCompareImageClicked = False
         self.__compareImagePath = ""
+        # Init QSystemTrayIcon
+        self.trayIcon = QSystemTrayIcon(self)
+        self.trayIcon.setIcon(self.style().standardIcon(QStyle.SP_ComputerIcon))
+        showAction = QAction("Show", self)
+        quitAction = QAction("Exit", self)
+        hideAction = QAction("Hide", self)
+        showAction.triggered.connect(self.show)
+        hideAction.triggered.connect(self.hide)
+        quitAction.triggered.connect(qApp.quit)
+        trayMenu = QMenu()
+        trayMenu.addAction(showAction)
+        trayMenu.addAction(hideAction)
+        trayMenu.addAction(quitAction)
+        self.trayIcon.setContextMenu(trayMenu)
+        self.trayIcon.show()
 
     def changeEvent(self, event):
         if event.type() == QtCore.QEvent.WindowStateChange:
             if self.windowState() and QtCore.Qt.WindowMinimized:
+                self.hide()
+                # self.trayIcon.showMessage("Tray Program", "Application was minimized to Tray", QSystemTrayIcon.Information, 2000)
                 print("WindowMinimized")
             elif self.windowState() == QtCore.Qt.WindowNoState or event.oldState() == QtCore.Qt.WindowMaximized:
                 print("WindowMaximized")
