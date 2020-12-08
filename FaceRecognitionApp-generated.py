@@ -18,6 +18,13 @@ class UiMainWindow(QtWidgets.QMainWindow):
         self.__onCompareImageClicked = False
         self.__compareImagePath = ""
 
+    def changeEvent(self, event):
+        if event.type() == QtCore.QEvent.WindowStateChange:
+            if self.windowState() and QtCore.Qt.WindowMinimized:
+                print("WindowMinimized")
+            elif self.windowState() == QtCore.Qt.WindowNoState or event.oldState() == QtCore.Qt.WindowMaximized:
+                print("WindowMaximized")
+
     def closeEvent(self, event):
         reply = QMessageBox.question(self, "Quit", "Are you sure to quit?", QMessageBox.No | QMessageBox.Yes)
         if reply == QMessageBox.Yes:
