@@ -23,7 +23,7 @@ class UiMainWindow(QtWidgets.QMainWindow):
         showAction = QAction("Show", self)
         quitAction = QAction("Exit", self)
         hideAction = QAction("Hide", self)
-        showAction.triggered.connect(self.show)
+        showAction.triggered.connect(self.showNormal)
         hideAction.triggered.connect(self.hide)
         quitAction.triggered.connect(qApp.quit)
         trayMenu = QMenu()
@@ -31,15 +31,16 @@ class UiMainWindow(QtWidgets.QMainWindow):
         trayMenu.addAction(hideAction)
         trayMenu.addAction(quitAction)
         self.trayIcon.setContextMenu(trayMenu)
-        self.trayIcon.show()
 
     def changeEvent(self, event):
         if event.type() == QtCore.QEvent.WindowStateChange:
             if self.windowState() and QtCore.Qt.WindowMinimized:
                 self.hide()
+                self.trayIcon.show()
                 # self.trayIcon.showMessage("Tray Program", "Application was minimized to Tray", QSystemTrayIcon.Information, 2000)
                 print("WindowMinimized")
             elif self.windowState() == QtCore.Qt.WindowNoState or event.oldState() == QtCore.Qt.WindowMaximized:
+                self.trayIcon.hide()
                 print("WindowMaximized")
 
     def closeEvent(self, event):
