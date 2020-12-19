@@ -13,6 +13,7 @@ class UiMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi()
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.__toggleCam = False
         self.__onCaptureClicked = False
         self.__onCompareImageClicked = False
