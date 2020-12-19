@@ -12,8 +12,10 @@ import os
 class UiMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self.screenSize = QtWidgets.QDesktopWidget().screenGeometry(-1)
         self.setupUi()
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(QtCore.Qt.ToolTip | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
         self.__toggleCam = False
         self.__onCaptureClicked = False
         self.__onCompareImageClicked = False
@@ -24,7 +26,7 @@ class UiMainWindow(QtWidgets.QMainWindow):
         showAction = QAction("Show", self)
         quitAction = QAction("Exit", self)
         hideAction = QAction("Hide", self)
-        showAction.triggered.connect(self.showNormal)
+        showAction.triggered.connect(self.showMainWindow)
         hideAction.triggered.connect(self.hide)
         quitAction.triggered.connect(qApp.quit)
         trayMenu = QMenu()
@@ -35,14 +37,14 @@ class UiMainWindow(QtWidgets.QMainWindow):
 
     def changeEvent(self, event):
         if event.type() == QtCore.QEvent.WindowStateChange:
-            if self.windowState() and QtCore.Qt.WindowMinimized:
+            if event.oldState() == QtCore.Qt.WindowMinimized:
+                self.trayIcon.hide()
+                # self.trayIcon.showMessage("Tray Program", "Application was minimized to Tray", QSystemTrayIcon.Information, 2000)
+                print("WindowMaximized")
+            elif event.oldState() == QtCore.Qt.WindowNoState or self.windowState() == QtCore.Qt.WindowMinimized:
                 self.hide()
                 self.trayIcon.show()
-                # self.trayIcon.showMessage("Tray Program", "Application was minimized to Tray", QSystemTrayIcon.Information, 2000)
                 print("WindowMinimized")
-            elif self.windowState() == QtCore.Qt.WindowNoState or event.oldState() == QtCore.Qt.WindowMaximized:
-                self.trayIcon.hide()
-                print("WindowMaximized")
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, "Quit", "Are you sure to quit?", QMessageBox.No | QMessageBox.Yes)
@@ -52,11 +54,20 @@ class UiMainWindow(QtWidgets.QMainWindow):
         else:
             event.ignore()
 
+    def hideMainWindowToTray(self):
+        self.hide()
+        self.trayIcon.show()
+
+    def showMainWindow(self):
+        self.showNormal()
+        self.trayIcon.hide()
+
     def setupUi(self):
         self.setObjectName("MainWindow")
-        self.resize(800, 520)
-        self.setMinimumSize(QtCore.QSize(800, 520))
-        self.setMaximumSize(QtCore.QSize(800, 520))
+        self.resize(self.screenSize.width(), self.screenSize.height())
+        # self.resize(800, 520)
+        # self.setMinimumSize(QtCore.QSize(800, 520))
+        # self.setMaximumSize(QtCore.QSize(800, 520))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/src/Themes/eyeIcon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         icon.addPixmap(QtGui.QPixmap(":/src/Themes/eyeIcon.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
@@ -100,9 +111,15 @@ class UiMainWindow(QtWidgets.QMainWindow):
         self.chooseCompareImageButton = QtWidgets.QPushButton(self.layoutWidget)
         self.chooseCompareImageButton.setObjectName("chooseCompareImageButton")
         self.verticalLayout.addWidget(self.chooseCompareImageButton)
-        self.CompareButton = QtWidgets.QPushButton(self.layoutWidget)
-        self.CompareButton.setObjectName("CompareButton")
-        self.verticalLayout.addWidget(self.CompareButton)
+        self.compareButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.compareButton.setObjectName("compareButton")
+        self.verticalLayout.addWidget(self.compareButton)
+        self.minimizeButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.minimizeButton.setObjectName("minimizeButton")
+        self.verticalLayout.addWidget(self.minimizeButton)
+        self.quitButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.quitButton.setObjectName("quitButton")
+        self.verticalLayout.addWidget(self.quitButton)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -121,7 +138,9 @@ class UiMainWindow(QtWidgets.QMainWindow):
         self.toggleCameraButton.clicked.connect(self.displayImage)
         self.captureButton.clicked.connect(self.captureImage)
         self.chooseCompareImageButton.clicked.connect(self.chooseImageToCompare)
-        self.CompareButton.clicked.connect(self.compareImage)
+        self.compareButton.clicked.connect(self.compareImage)
+        self.minimizeButton.clicked.connect(self.hideMainWindowToTray)
+        self.quitButton.clicked.connect(self.close)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
@@ -132,7 +151,9 @@ class UiMainWindow(QtWidgets.QMainWindow):
         self.toggleCameraButton.setText(_translate("MainWindow", "Turn On"))
         self.captureButton.setText(_translate("MainWindow", "Capture"))
         self.chooseCompareImageButton.setText(_translate("MainWindow", "Choose Image"))
-        self.CompareButton.setText(_translate("MainWindow", "Compare"))
+        self.compareButton.setText(_translate("MainWindow", "Compare"))
+        self.minimizeButton.setText(_translate("MainWindow", "Minimize"))
+        self.quitButton.setText(_translate("MainWindow", "Quit"))
         self.resultTitleLabel.setText(_translate("MainWindow", "Result:"))
         self.resultLabel.setText(_translate("MainWindow", "False"))
 
